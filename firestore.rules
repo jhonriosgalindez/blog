@@ -1,0 +1,69 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // Global Safety Net catch-all
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Helper functions
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    // --- Users Collection ---
+    match /users/{userId} {
+      allow read, write: if isOwner(userId);
+    }
+
+    // --- User Posts Collection ---
+    match /user_posts/{postId} {
+      // Create rules
+      allow create: if isSignedIn() 
+        && incoming().authorUid == request.auth.uid
+        && incoming().title is string && incoming().title.size() > 0 && incoming().title.size() <= 200
+        && incoming().content is string && incoming().content.size() > 0 && incoming().content.size() <= 50000
+        && incoming().slug is string && incoming().slug.size() > 0 && incoming().slug.size() <= 250
+        && incoming().estado in ['Borrador', 'Revisión', 'Publicado', 'Archivado'];
+        
+      // Update rules
+      allow update: if isSignedIn()
+        && resource.data.authorUid == request.auth.uid
+        && incoming().authorUid == request.auth.uid
+        && incoming().title is string && incoming().title.size() > 0 && incoming().title.size() <= 200
+        && incoming().content is string && incoming().content.size() > 0 && incoming().content.size() <= 50000
+        && incoming().slug is string && incoming().slug.size() > 0 && incoming().slug.size() <= 250
+        && incoming().estado in ['Borrador', 'Revisión', 'Publicado', 'Archivado'];
+
+      // Delete rules
+      allow delete: if isSignedIn() && (resource == null || !('authorUid' in resource.data) || resource.data.authorUid == request.auth.uid);
+
+      // Read rules (get and list)
+      allow get, list: if resource.data.estado == 'Publicado';
+      allow get, list: if isSignedIn() && resource.data.authorUid == request.auth.uid;
+    }
+
+    // --- Categories Collection ---
+    match /categories/{categoryId} {
+      allow read, write: if isSignedIn();
+    }
+
+    // --- Tags Collection ---
+    match /tags/{tagId} {
+      allow read, write: if isSignedIn();
+    }
+  }
+}

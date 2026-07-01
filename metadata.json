@@ -1,0 +1,8 @@
+{
+  "name": "Horizone - AI Travel Blog",
+  "description": "Una plataforma editorial autogestionada para blogs de viajes, gastronomía, diseño y estilo de vida con base de datos en tiempo real.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}

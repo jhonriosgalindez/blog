@@ -1,0 +1,89 @@
+{
+  "entities": {
+    "User": {
+      "title": "User",
+      "description": "User profile representation in Firestore",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string" },
+        "displayName": { "type": "string" },
+        "email": { "type": "string" },
+        "photoURL": { "type": "string" },
+        "providerId": { "type": "string" },
+        "lastLogin": { "type": "string" },
+        "createdAt": { "type": "string" },
+        "rol": { "type": "string", "enum": ["Administrador", "Editor", "Autor", "Lector"] },
+        "biografia": { "type": "string" },
+        "foto_perfil": { "type": "string" }
+      },
+      "required": ["uid", "email"]
+    },
+    "Category": {
+      "title": "Category",
+      "description": "Category item in the taxonomy",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "nombre": { "type": "string" },
+        "slug": { "type": "string" }
+      },
+      "required": ["nombre", "slug"]
+    },
+    "Tag": {
+      "title": "Tag",
+      "description": "Tag item in the taxonomy",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "nombre": { "type": "string" },
+        "slug": { "type": "string" }
+      },
+      "required": ["nombre", "slug"]
+    },
+    "BlogPost": {
+      "title": "BlogPost",
+      "description": "A blog post or article written by a user",
+      "type": "object",
+      "properties": {
+        "title": { "type": "string" },
+        "slug": { "type": "string" },
+        "summary": { "type": "string" },
+        "content": { "type": "string" },
+        "category": { "type": "string" },
+        "tags": { "type": "array" },
+        "author": { "type": "object" },
+        "authorUid": { "type": "string" },
+        "estado": { "type": "string", "enum": ["Borrador", "Revisión", "Publicado", "Archivado"] },
+        "imageUrl": { "type": "string" },
+        "date": { "type": "string" },
+        "readTime": { "type": "string" },
+        "isAiGenerated": { "type": "boolean" },
+        "meta_titulo": { "type": "string" },
+        "meta_descripcion": { "type": "string" },
+        "palabra_clave_principal": { "type": "string" },
+        "createdAt": { "type": "object" },
+        "updatedAt": { "type": "object" },
+        "publishedAt": { "type": "object" }
+      },
+      "required": ["title", "content", "authorUid", "slug", "estado"]
+    }
+  },
+  "firestore": {
+    "users/{userId}": {
+      "schema": "User",
+      "description": "Collection of user profiles"
+    },
+    "user_posts/{postId}": {
+      "schema": "BlogPost",
+      "description": "Collection of blog posts written by users"
+    },
+    "categories/{categoryId}": {
+      "schema": "Category",
+      "description": "Collection of categories"
+    },
+    "tags/{tagId}": {
+      "schema": "Tag",
+      "description": "Collection of tags"
+    }
+  }
+}
