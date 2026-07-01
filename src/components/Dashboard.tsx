@@ -232,11 +232,15 @@ export default function Dashboard({ currentUser, onPostCreated, onPostDeleted, o
       await deleteDoc(doc(db, "user_posts", postId));
 
       // Delete from fallback server cache
-      const res = await fetch(`/api/posts/${postId}`, {
-        method: "DELETE"
-      });
-      if (!res.ok) {
-        console.warn("Could not delete from in-memory backend, but deleted from Firestore successfully.");
+      try {
+        const res = await fetch(`/api/posts/${postId}`, {
+          method: "DELETE"
+        });
+        if (!res.ok) {
+          console.warn("Could not delete from in-memory backend, but deleted from Firestore successfully.");
+        }
+      } catch (fetchErr) {
+        console.warn("Skipped deleting from global cache because backend is offline/serverless:", fetchErr);
       }
 
       setSuccess("Article deleted successfully!");
@@ -378,16 +382,20 @@ export default function Dashboard({ currentUser, onPostCreated, onPostDeleted, o
         }
 
         // Sync local memory store
-        const response = await fetch(`/api/posts/${editingPostId}`, {
-          method: "PUT",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            ...newPostData
-          })
-        });
+        try {
+          const response = await fetch(`/api/posts/${editingPostId}`, {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              ...newPostData
+            })
+          });
 
-        if (!response.ok) {
-          console.warn("Could not update globally in-memory, but saved to Firestore.");
+          if (!response.ok) {
+            console.warn("Could not update globally in-memory, but saved to Firestore.");
+          }
+        } catch (fetchErr) {
+          console.warn("Skipped updating global cache because backend is offline/serverless:", fetchErr);
         }
       } else {
         let docRef;
@@ -406,17 +414,21 @@ export default function Dashboard({ currentUser, onPostCreated, onPostDeleted, o
         }
 
         // Sync local memory store
-        const response = await fetch("/api/posts", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            ...newPostData,
-            id: postId
-          })
-        });
+        try {
+          const response = await fetch("/api/posts", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              ...newPostData,
+              id: postId
+            })
+          });
 
-        if (!response.ok) {
-          console.warn("Could not register globally in-memory, but saved to Firestore.");
+          if (!response.ok) {
+            console.warn("Could not register globally in-memory, but saved to Firestore.");
+          }
+        } catch (fetchErr) {
+          console.warn("Skipped registering in global cache because backend is offline/serverless:", fetchErr);
         }
       }
 

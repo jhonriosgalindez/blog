@@ -11,6 +11,7 @@ import { Loader2, AlertCircle, RefreshCw } from "lucide-react";
 import RegisterModal from "./components/RegisterModal";
 import { auth, onAuthStateChanged, signOut, type User, db } from "./lib/firebase";
 import { collection, query, where, getDocs } from "firebase/firestore";
+import { DEFAULT_POSTS } from "./defaultPosts";
 
 export default function App() {
   // Application State
@@ -58,8 +59,9 @@ export default function App() {
         throw new Error(data.error || "Failed to load posts.");
       }
     } catch (err: any) {
-      console.error(err);
-      setError("Could not connect to Horizone database server.");
+      console.warn("Could not connect to database server. Falling back to default posts for offline/serverless mode (Vercel):", err);
+      // Use premium default posts in client-side fallback
+      setPosts(DEFAULT_POSTS);
     } finally {
       setLoading(false);
     }
