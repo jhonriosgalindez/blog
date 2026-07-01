@@ -13,18 +13,18 @@ import {
 import { getFirestore, doc, setDoc, getDoc } from "firebase/firestore";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyDLmbmp7JnBgZYO1zwxJfzu5AFpyjLJiWw",
-  authDomain: "gen-lang-client-0297464303.firebaseapp.com",
-  projectId: "gen-lang-client-0297464303",
-  storageBucket: "gen-lang-client-0297464303.firebasestorage.app",
-  messagingSenderId: "783720413426",
-  appId: "1:783720413426:web:6aadb14b891156e6adf86b"
+  apiKey: (import.meta as any).env.VITE_FIREBASE_API_KEY || "",
+  authDomain: (import.meta as any).env.VITE_FIREBASE_AUTH_DOMAIN || "",
+  projectId: (import.meta as any).env.VITE_FIREBASE_PROJECT_ID || "",
+  storageBucket: (import.meta as any).env.VITE_FIREBASE_STORAGE_BUCKET || "",
+  messagingSenderId: (import.meta as any).env.VITE_FIREBASE_MESSAGING_SENDER_ID || "",
+  appId: (import.meta as any).env.VITE_FIREBASE_APP_ID || ""
 };
 
 // Initialize Firebase
 const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApp();
 const auth = getAuth(app);
-const db = getFirestore(app, "ai-studio-horizoneaitravel-5b60529a-f9ce-40ea-ace7-6a4c4c55cdc8");
+const db = getFirestore(app, (import.meta as any).env.VITE_FIREBASE_DATABASE_ID || "ai-studio-horizoneaitravel-5b60529a-f9ce-40ea-ace7-6a4c4c55cdc8");
 
 const googleProvider = new GoogleAuthProvider();
 googleProvider.setCustomParameters({ prompt: "select_account" });
